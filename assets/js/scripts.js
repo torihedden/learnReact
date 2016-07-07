@@ -1,11 +1,34 @@
+// var data = [
+//   {author: 'Zoe Washburn', points: 45, body: 'This is one comment.'},
+//   {author: 'Willow Rosenberg', points: 102, body: 'This is *another* comment.'},
+//   {author: 'Martha Jones', points: 88, body: 'My comment is here.'},
+//   {author: 'Kelly Murray', points: 450, body: 'JavaScript is your friend!'}
+// ]
+//unclear if this data array can be named something else. I tried assigning the variable a more meaningful name but found it difficult to plug in the variable name correctly.
+
 var CommentBox = React.createClass({
+  getInitialState: function() {
+   return {data: []};
+  },
+  componentDidMount: function() {
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
   render: function() {
     return (
       <div className="commentBox">
         <h1>Comments</h1>
-        <h3>Leave your comment below.</h3>
-        <CommentList />
-        <CommentForm />
+        <CommentList data={this.state.data}/>
+        <CommentForm/>
       </div>
     );
   }
@@ -19,10 +42,18 @@ var CommentBox = React.createClass({
 
 var CommentList = React.createClass({
   render: function() {
+    var commentNodes = this.props.data.map(function(comment) {
+      return (
+        <Comment author={comment.author}>
+          <div>{comment.body}</div>
+          <div>This comment has {comment.points} points.</div>
+        </Comment>
+      );
+    });
+
     return (
       <div className="commentList">
-        <Comment author="Zoe Washburn" points='45'>This is one comment</Comment>
-        <Comment author="Willow Rosenberg" points='102'>This is *another* comment</Comment>
+        {commentNodes}
       </div>
     );
   }
@@ -36,14 +67,14 @@ var Comment = React.createClass({
         <h2 className="commentAuthor">
           {this.props.author}
         </h2>
-        <div className="points">
-          This comment has {this.props.points} points.
-        </div>
         {this.props.children}
       </div>
     );
   }
 });
+//if I remove {this.props.children}, the comment body markdown does not render on the page.
+
+// "Data passed in from a parent component is available as a 'property' on the child component. These 'properties' are accessed through this.props"
 
 //remember class is a reserved word in JS... so HTML elements get a class according to className
 
@@ -58,7 +89,7 @@ var CommentForm = React.createClass({
 });
 
 ReactDOM.render(
-  <CommentBox />,
+  <CommentBox url="http://localhost:3004/db"/>,
   document.getElementById('comments')
 );
 
