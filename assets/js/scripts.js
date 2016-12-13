@@ -10,7 +10,7 @@ var CommentBox = React.createClass({
   getInitialState: function() {
    return {data: []};
   },
-  componentDidMount: function() {
+  loadCommentsFromServer: function() {
     $.ajax({
       url: this.props.url,
       dataType: 'json',
@@ -22,6 +22,10 @@ var CommentBox = React.createClass({
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
+  },
+  componentDidMount: function() {
+    this.loadCommentsFromServer();
+    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
   },
   render: function() {
     return (
@@ -46,7 +50,7 @@ var CommentList = React.createClass({
       return (
         <Comment author={comment.author}>
           <div>{comment.body}</div>
-          <div>This comment has {comment.points} points.</div>
+          <div className='score'>This comment has {comment.points} points.</div>
         </Comment>
       );
     });
@@ -82,14 +86,13 @@ var CommentForm = React.createClass({
   render: function() {
     return (
       <div className="commentForm">
-        Hello, world! I am a CommentForm.
       </div>
     );
   }
 });
 
 ReactDOM.render(
-  <CommentBox url="http://localhost:3004/db"/>,
+  <CommentBox url="http://localhost:3004/db" pollInterval={2000}/>,
   document.getElementById('comments')
 );
 

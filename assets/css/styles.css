@@ -2,7 +2,11 @@ body {
   font-family: Tahoma, sans-serif;
 }
 
-.commentBox, .commentList, .commentForm {
+.commentBox, .comment {
   border: solid 1px lightgray;
-  margin: 5% 0 0 0;
+  margin: 2%;
+}
+
+.score {
+  margin: 2% 0 0 0;
 }
